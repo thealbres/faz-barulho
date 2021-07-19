@@ -1,7 +1,12 @@
 import React, { useRef, useEffect } from 'react';
 import logo from '../../../assets/faz-barulho.png'
 import { Animated } from 'react-native'
-import { Container, ButtonForward, ButtonText } from './styles'
+
+import {
+    Container,
+    ButtonForward,
+    ButtonText
+} from './styles'
 
 const Home = ({ navigation }) => {
     const anim = useRef(new Animated.Value(1));

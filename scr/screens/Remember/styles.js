@@ -43,6 +43,7 @@ export const ButtonForward = styled.TouchableOpacity`
   border-radius: 70px;
   align-items: center;
   align-self: flex-end;
+  margin-right: 10px;
   justify-content: center;
   shadow-color: #000;
   box-shadow: 10px 15px;

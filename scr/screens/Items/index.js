@@ -1,9 +1,22 @@
 import React, { useState } from 'react';
-import { Container, Title, TextInput, ButtonForward, ButtonText, Row } from './styles'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { showMessage } from "react-native-flash-message";
+import * as SQLite from "expo-sqlite";
+
+import {
+    Container,
+    Title,
+    TextInput,
+    ButtonForward,
+    ButtonText,
+    Row
+} from './styles'
+
+
 
 const Item = ({ route, navigation }) => {
+    const db = SQLite.openDatabase("db.db");
+
     const { loudness, soundLevel, color } = route.params;
     const [name, setName] = useState('');
 
@@ -14,29 +27,15 @@ const Item = ({ route, navigation }) => {
                 type: "danger",
             })
         } else {
-            let item = {
-                name: name,
-                loudness: loudness,
-                soundLevel: soundLevel,
-                color: color,
-            }
             try {
-                const itens = await AsyncStorage.getItem('@itens')
-                if (itens == null) {
-                    const itens = []
-                    itens.push(item)
+                db.transaction(
+                    (tx) => {
+                        tx.executeSql("insert into items (name, loudness, soundLevel, color) values (?, ?, ?, ?)", [name, loudness, soundLevel, color]);
+                    },
+                    null,
+                );
+                navigation.navigate('Lembrar');
 
-                    var itensConverted = JSON.stringify(itens);
-                    await AsyncStorage.setItem('@itens', itensConverted)
-                    navigation.navigate('Remember');
-                } else {
-                    var itensParsed = JSON.parse(itens);
-                    itensParsed.push(item)
-                    var itensConverted = JSON.stringify(itensParsed);
-                    await AsyncStorage.setItem('@itens', itensConverted)
-                    navigation.navigate('Remember');
-
-                }
             } catch (e) {
                 console.log("ERRO", e)
             }
@@ -46,7 +45,7 @@ const Item = ({ route, navigation }) => {
         <Container>
             <Title>Nome</Title>
             <TextInput onChangeText={setName} placeholder="Escolha o nome" />
-            <Title>Volume</Title>
+            <Title>dBFS</Title>
             <TextInput editable={false} value={loudness} placeholder="80" />
             <Title>Classificação </Title>
             <TextInput editable={false} value={soundLevel} placeholder="Não faz barulho!" />
@@ -58,7 +57,6 @@ const Item = ({ route, navigation }) => {
                 </ButtonText>
                 </ButtonForward>
             </Row>
-
         </Container>
     );
 }
